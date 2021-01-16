@@ -10,13 +10,22 @@ Input4J lets you add unified input events using easy identifiers (like Strings) 
 
 ## Features
 
+- receive input events based on easy to use names
+- save/load input configs
+
 ### Planned
 
-- receive input events based on easy to use names
 - keyboard/mouse input from AWT/swing
 - controller input using [libSDL](https://www.libsdl.org/)
-- save/load input configs
 - *swing-based input change GUI* (not certain)
+
+## Folders
+
+### `core`
+
+This is the core library of Input4J.
+It contains the code used to interact with Input4J, but no input source of its own.  
+To get an input source, you have to define one yourself.
 
 ## Branches
 
