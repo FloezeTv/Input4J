@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -20,6 +22,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
  */
 public class Input4J<T> {
 
+	private final Map<T, InputSource> inputSources;
+
 	private final InputConfiguration<T> config;
 
 	/**
@@ -27,6 +31,7 @@ public class Input4J<T> {
 	 * {@link InputConfiguration}.
 	 */
 	public Input4J() {
+		inputSources = new HashMap<T, InputSource>();
 		config = new InputConfiguration<T>();
 	}
 
@@ -43,6 +48,7 @@ public class Input4J<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public Input4J(String xml) throws JsonMappingException, JsonProcessingException, ClassNotFoundException {
+		inputSources = new HashMap<T, InputSource>();
 		config = (InputConfiguration<T>) InputConfiguration.load(xml);
 	}
 
@@ -59,6 +65,7 @@ public class Input4J<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public Input4J(InputStream xml) throws ClassNotFoundException, IOException {
+		inputSources = new HashMap<T, InputSource>();
 		config = (InputConfiguration<T>) InputConfiguration.load(xml);
 	}
 
@@ -75,6 +82,7 @@ public class Input4J<T> {
 	 */
 	@SuppressWarnings("unchecked")
 	public Input4J(File xml) throws ClassNotFoundException, IOException {
+		inputSources = new HashMap<T, InputSource>();
 		config = (InputConfiguration<T>) InputConfiguration.load(xml);
 	}
 
@@ -84,7 +92,89 @@ public class Input4J<T> {
 	 * @return an {@link InputMap} filed with the current inputs.
 	 */
 	public InputMap<T> update() {
-		return new InputMap<T>();
+		InputMap<T> map = new InputMap<T>();
+		inputSources.forEach((name, source) -> source.update(map, config));
+		return map;
+	}
+
+	/**
+	 * See {@link InputSource#saveInputs()}.
+	 */
+	public void saveInputs() {
+		inputSources.forEach((sourceName, source) -> source.saveInputs());
+	}
+
+	/**
+	 * See {@link InputSource#saveInputs()}.
+	 * 
+	 * This only saves the inputs for the {@link InputSource}s with the specified
+	 * names.
+	 * 
+	 * @param names names of {@link InputSource}s to save inputs
+	 */
+	public void saveInputs(@SuppressWarnings("unchecked") T... names) {
+		inputSources.entrySet().stream().filter(e -> {
+			for (T n : names)
+				if (e.getKey().equals(n))
+					return true;
+			return false;
+		}).forEach((e) -> e.getValue().saveInputs());
+	}
+
+	/**
+	 * 
+	 * See {@link InputSource#setInput(int, Object, short, InputConfiguration)}.
+	 */
+	public boolean setInput(int player, T name, short value) {
+		for (InputSource s : inputSources.values()) {
+			boolean r = s.setInput(player, name, value, config);
+			if (r)
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * See {@link InputSource#setInput(int, Object, short, InputConfiguration)}.
+	 * 
+	 * @param names names of {@link InputSource}s to set inputs
+	 */
+	public boolean setInput(int player, T name, short value, @SuppressWarnings("unchecked") T... names) {
+		InputSource[] is = inputSources.entrySet().stream().filter(e -> {
+			for (T n : names)
+				if (e.getKey().equals(n))
+					return true;
+			return false;
+		}).map(e -> e.getValue()).toArray(s -> new InputSource[s]);
+		for (InputSource s : is) {
+			boolean r = s.setInput(player, name, value, config);
+			if (r)
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Adds an {@link InputSource} using an {@link InputSourceBuilder}.
+	 * 
+	 * @param name    name of {@link InputSource} to add. If name was already taken,
+	 *                the previous {@link InputSource} will be disabled and
+	 *                discarded.
+	 * @param builder {@link InputSourceBuilder} to build the {@link InputSource}.
+	 */
+	public void addInputSource(T name, InputSourceBuilder builder) {
+		inputSources.compute(name, (key, value) -> {
+			if (value != null)
+				value.disable();
+			return builder.build();
+		});
+	}
+
+	/**
+	 * See {@link InputConfiguration#clearInput(int, Object)}
+	 */
+	public void clearInput(int player, T name) {
+		config.clearInput(player, name);
 	}
 
 	/**
