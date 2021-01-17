@@ -29,16 +29,16 @@ To get an input source, you have to define one yourself.
 
 ## Branches
 
-| Branch name                | branch from       | merge into                | description                             |
-| -------------------------- | ----------------- | ------------------------- | --------------------------------------- |
-| **master**                 |                   |                           | current live-version                    |
-| **release/`version`**      | master            |                           | released versions                       |
-| **fix/`issue`-`name`**     | master            | master                    | fix for a bug                           |
-| **hotfix/`issue`-`name`**  | release/`current` | release/`current`, master | hotfix for a currently released version |
-| **feature/`issue`-`name`** | master            | master                    | new feature                             |
+| Branch name                | branch from | merge into      | description                               |
+| -------------------------- | ----------- | --------------- | ----------------------------------------- |
+| **master**                 |             |                 | current released version                  |
+| **develop**                |             |                 | current development version               |
+| **release/`version`**      | develop     | master, develop | prepares for releases (bump version, ...) |
+| **fix/`issue`-`name`**     | develop     | develop         | fix for a bug                             |
+| **hotfix/`issue`-`name`**  | master      | master, develop | hotfix for a currently released version   |
+| **feature/`issue`-`name`** | develop     | develop         | new feature                               |
 
 With:
 - `version`: a release version of the project
-- `current`: the current version ot the project
 - `issue`: a issue reference that tracks that bug/hotfix/feature
 - `name`: a short descriptive name of the bug/hotfix/feature
