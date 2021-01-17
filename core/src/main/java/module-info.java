@@ -1,5 +1,4 @@
 module Input4J {
-	exports tv.floeze.Input4J.example;
 	exports tv.floeze.Input4J;
 	
 	opens tv.floeze.Input4J to com.fasterxml.jackson.databind;
