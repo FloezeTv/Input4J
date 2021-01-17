@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -168,6 +169,76 @@ public class Input4J<T> {
 				value.disable();
 			return builder.build();
 		});
+	}
+
+	/**
+	 * Enables all {@link InputSource}s.
+	 * 
+	 * See {@link InputSource#enable()}.
+	 */
+	public void enableAll() {
+		inputSources.forEach((identifier, source) -> source.enable());
+	}
+
+	/**
+	 * Disables all {@link InputSource}s.
+	 * 
+	 * See {@link InputSource#disable()}.
+	 */
+	public void disableAll() {
+		inputSources.forEach((identifier, source) -> source.disable());
+	}
+
+	/**
+	 * Enables the {@link InputSource} with the given name if it exists.
+	 * 
+	 * See {@link InputSource#enable()}.
+	 * 
+	 * @param identifier identifier of {@link InputSource} to enable
+	 */
+	public void enable(T identifier) {
+		InputSource s = inputSources.get(identifier);
+		if (s == null)
+			return;
+		s.enable();
+	}
+
+	/**
+	 * Disables the {@link InputSource} with the given name if it exists.
+	 * 
+	 * See {@link InputSource#enable()}.
+	 * 
+	 * @param identifier identifier of {@link InputSource} to disable
+	 */
+	public void disable(T identifier) {
+		InputSource s = inputSources.get(identifier);
+		if (s == null)
+			return;
+		s.disable();
+	}
+
+	/**
+	 * Checks if the {@link InputSource} with the given name is enabled.
+	 * 
+	 * See {@link InputSource#isEnabled()}.
+	 * 
+	 * @param identifier identifier of {@link InputSource} to check
+	 * @return true if enabled, false otherwise
+	 */
+	public boolean isEnabled(T identifier) {
+		InputSource s = inputSources.get(identifier);
+		if (s == null)
+			return false;
+		return s.isEnabled();
+	}
+
+	/**
+	 * Gets the identifiers of all {@link InputSource}s.
+	 * 
+	 * @return the identifiers of all {@link InputSource}s
+	 */
+	public Set<T> getInputSourceIdentifiers() {
+		return inputSources.keySet();
 	}
 
 	/**
