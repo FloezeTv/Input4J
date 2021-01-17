@@ -94,7 +94,7 @@ public class Input4J<T> {
 	 */
 	public InputMap<T> update() {
 		InputMap<T> map = new InputMap<T>();
-		inputSources.forEach((name, source) -> source.update(map, config));
+		inputSources.forEach((identifier, source) -> source.update(map, config));
 		return map;
 	}
 
@@ -109,14 +109,14 @@ public class Input4J<T> {
 	 * See {@link InputSource#saveInputs()}.
 	 * 
 	 * This only saves the inputs for the {@link InputSource}s with the specified
-	 * names.
+	 * identifiers.
 	 * 
-	 * @param names names of {@link InputSource}s to save inputs
+	 * @param identifiers identifiers of {@link InputSource}s to save inputs
 	 */
-	public void saveInputs(@SuppressWarnings("unchecked") T... names) {
+	public void saveInputs(@SuppressWarnings("unchecked") T... identifiers) {
 		inputSources.entrySet().stream().filter(e -> {
-			for (T n : names)
-				if (e.getKey().equals(n))
+			for (T i : identifiers)
+				if (e.getKey().equals(i))
 					return true;
 			return false;
 		}).forEach((e) -> e.getValue().saveInputs());
@@ -126,9 +126,9 @@ public class Input4J<T> {
 	 * 
 	 * See {@link InputSource#setInput(int, Object, short, InputConfiguration)}.
 	 */
-	public boolean setInput(int player, T name, short value) {
+	public boolean setInput(int player, T identifier, short value) {
 		for (InputSource s : inputSources.values()) {
-			boolean r = s.setInput(player, name, value, config);
+			boolean r = s.setInput(player, identifier, value, config);
 			if (r)
 				return true;
 		}
@@ -138,17 +138,17 @@ public class Input4J<T> {
 	/**
 	 * See {@link InputSource#setInput(int, Object, short, InputConfiguration)}.
 	 * 
-	 * @param names names of {@link InputSource}s to set inputs
+	 * @param identifiers identifiers of {@link InputSource}s to set inputs
 	 */
-	public boolean setInput(int player, T name, short value, @SuppressWarnings("unchecked") T... names) {
+	public boolean setInput(int player, T identifier, short value, @SuppressWarnings("unchecked") T... identifiers) {
 		InputSource[] is = inputSources.entrySet().stream().filter(e -> {
-			for (T n : names)
-				if (e.getKey().equals(n))
+			for (T i : identifiers)
+				if (e.getKey().equals(i))
 					return true;
 			return false;
 		}).map(e -> e.getValue()).toArray(s -> new InputSource[s]);
 		for (InputSource s : is) {
-			boolean r = s.setInput(player, name, value, config);
+			boolean r = s.setInput(player, identifier, value, config);
 			if (r)
 				return true;
 		}
@@ -158,13 +158,13 @@ public class Input4J<T> {
 	/**
 	 * Adds an {@link InputSource} using an {@link InputSourceBuilder}.
 	 * 
-	 * @param name    name of {@link InputSource} to add. If name was already taken,
+	 * @param identifier    identifier of {@link InputSource} to add. If identifier was already taken,
 	 *                the previous {@link InputSource} will be disabled and
 	 *                discarded.
 	 * @param builder {@link InputSourceBuilder} to build the {@link InputSource}.
 	 */
-	public void addInputSource(T name, InputSourceBuilder builder) {
-		inputSources.compute(name, (key, value) -> {
+	public void addInputSource(T identifier, InputSourceBuilder builder) {
+		inputSources.compute(identifier, (key, value) -> {
 			if (value != null)
 				value.disable();
 			return builder.build();
@@ -190,7 +190,7 @@ public class Input4J<T> {
 	}
 
 	/**
-	 * Enables the {@link InputSource} with the given name if it exists.
+	 * Enables the {@link InputSource} with the given identifier if it exists.
 	 * 
 	 * See {@link InputSource#enable()}.
 	 * 
@@ -204,7 +204,7 @@ public class Input4J<T> {
 	}
 
 	/**
-	 * Disables the {@link InputSource} with the given name if it exists.
+	 * Disables the {@link InputSource} with the given identifier if it exists.
 	 * 
 	 * See {@link InputSource#enable()}.
 	 * 
@@ -218,7 +218,7 @@ public class Input4J<T> {
 	}
 
 	/**
-	 * Checks if the {@link InputSource} with the given name is enabled.
+	 * Checks if the {@link InputSource} with the given identifier is enabled.
 	 * 
 	 * See {@link InputSource#isEnabled()}.
 	 * 
@@ -244,8 +244,8 @@ public class Input4J<T> {
 	/**
 	 * See {@link InputConfiguration#clearInput(int, Object)}
 	 */
-	public void clearInput(int player, T name) {
-		config.clearInput(player, name);
+	public void clearInput(int player, T identifier) {
+		config.clearInput(player, identifier);
 	}
 
 	/**
